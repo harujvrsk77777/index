@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+import os
+
+print("=" * 60)
+print("NYZ SCRIPTS - SUPER EASY UPDATER")
+print("=" * 60)
+print()
+
+name = input("Script Name: ")
+print("\nType:")
+print("  1 = Keyless")
+print("  2 = Instant UGC")
+script_type = input("Choose (1 or 2): ")
+badge = "⭐KEYLESS" if script_type == "1" else "🚀INSTANT UGC"
+code = input("\nScript Code: ")
+link = input("Game Link: ")
+
+print()
+has_extras = input("Add dropdown links? (y/n): ").lower() == 'y'
+
+extras_html = ""
+if has_extras:
+    print("\nEnter dropdown links (press Enter on empty label to finish):")
+    while True:
+        label = input("  Label (or Enter to finish): ")
+        if not label:
+            break
+        url = input("  URL: ")
+        extras_html += f'<div class="dropdown-item"><span>{label}</span><button class="btn btn-copy btn-small" onclick="event.stopPropagation(); copyLink(\'{url}\')">Copy Link</button></div>\n'
+
+if extras_html:
+    card = f'''
+<div class="script-card" data-name="{name}">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<h3>{name}</h3>
+<span class="dropdown-toggle" onclick="toggleDropdown(this)">▶</span>
+</div>
+<p>{badge}</p>
+<div class="btn-group">
+<button class="btn btn-copy" onclick="copyScript(this)" data-script="{code}">Copy Script</button>
+<a href="{link}" target="_blank" class="btn btn-game">Game Link</a>
+</div>
+<div class="dropdown-content">
+{extras_html}</div>
+</div>
+'''
+else:
+    card = f'''
+<div class="script-card" data-name="{name}">
+<h3>{name}</h3>
+<p>{badge}</p>
+<div class="btn-group">
+<button class="btn btn-copy" onclick="copyScript(this)" data-script="{code}">Copy Script</button>
+<a href="{link}" target="_blank" class="btn btn-game">Game Link</a>
+</div>
+</div>
+'''
+
+if os.path.exists('index.html'):
+    with open('index.html', 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    marker = '</div>\n</div>\n<script>'
+    
+    if marker in content:
+        parts = content.split(marker)
+        new_content = parts[0] + card + '\n</div>\n</div>\n<script>' + parts[1]
+        
+        with open('index.html', 'w', encoding='utf-8') as f:
+            f.write(new_content)
+        
+        print()
+        print("=" * 60)
+        print("✅ SUCCESS! Script added to index.html")
+        print("=" * 60)
+        print()
+        print("Now push to GitHub:")
+        print("  git add index.html")
+        print(f"  git commit -m 'Add {name}'")
+        print("  git push")
+        print("=" * 60)
+    else:
+        print()
+        print("❌ ERROR: Could not find the right place in index.html")
+        print("Make sure you're using the index.html file I provided!")
+else:
+    print()
+    print("❌ ERROR: index.html not found!")
+    print("Make sure this script is in the same folder as index.html")
